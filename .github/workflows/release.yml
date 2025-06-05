@@ -26,85 +26,13 @@ jobs:
     - name: Show Xcode version
       run: xcodebuild -version
       
-    - name: Clean build directory
-      run: rm -rf build/
+    - name: Make build script executable
+      run: chmod +x scripts/build_release.sh
       
-    - name: Build app for Release
-      run: |
-        xcodebuild -project avdmanager.xcodeproj \
-                   -scheme avdmanager \
-                   -configuration Release \
-                   -derivedDataPath build/ \
-                   -archivePath build/avdmanager.xcarchive \
-                   archive
-                   
-    - name: Export app from archive
-      run: |
-        # Create export options plist
-        cat > ExportOptions.plist << EOF
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-        <plist version="1.0">
-        <dict>
-            <key>method</key>
-            <string>developer-id</string>
-            <key>stripSwiftSymbols</key>
-            <true/>
-            <key>thinning</key>
-            <string>&lt;none&gt;</string>
-        </dict>
-        </plist>
-        EOF
-        
-        # Export the app
-        xcodebuild -exportArchive \
-                   -archivePath build/avdmanager.xcarchive \
-                   -exportOptionsPlist ExportOptions.plist \
-                   -exportPath build/export/
-                   
-    - name: Install create-dmg
-      run: brew install create-dmg
-      
-    - name: Create DMG
-      run: |
-        # Create a temporary directory for DMG contents
-        mkdir -p dmg-temp
-        
-        # Copy the app to the temp directory
-        cp -R build/export/avdmanager.app dmg-temp/
-        
-        # Create Applications symlink for USB cable installation
-        ln -s /Applications dmg-temp/Applications
-        
-        # Using default DMG background
-        echo "Using default DMG background"
-        
-        # Get version from git tag or use commit hash
-        if [[ $GITHUB_REF == refs/tags/* ]]; then
-          VERSION=${GITHUB_REF#refs/tags/v}
-        else
-          VERSION=$(git rev-parse --short HEAD)
-        fi
-        
-        # Create the DMG with USB cable background
-        create-dmg \
-          --volname "AVD Manager" \
-          --volicon "avdmanager/Assets.xcassets/AppIcon.appiconset/icon_512x512.png" \
-          --window-pos 200 120 \
-          --window-size 600 360 \
-          --icon-size 72 \
-          --icon "avdmanager.app" 165 180 \
-          --icon "Applications" 435 180 \
-          --hide-extension "avdmanager.app" \
-          --text-size 14 \
-          --format ULFO \
-          --filesystem HFS+ \
-          --skip-jenkins \
-          --codesign "Apple Development: prudhvi.reddy@deliveroo.com (6GSKHWTHQ7)" \
-          "AVD-Manager-${VERSION}.dmg" \
-          "dmg-temp/"
+    - name: Build and create DMG using local script
+      run: ./scripts/build_release.sh --keep
           
-    - name: Get version for release
+    - name: Get version and DMG info
       id: get_version
       run: |
         if [[ $GITHUB_REF == refs/tags/* ]]; then
@@ -119,11 +47,22 @@ jobs:
           echo "is_prerelease=true" >> $GITHUB_OUTPUT
         fi
         
-    - name: Calculate DMG checksum
-      run: |
-        DMG_FILE="AVD-Manager-${{ steps.get_version.outputs.version }}.dmg"
-        shasum -a 256 "$DMG_FILE" > "${DMG_FILE}.sha256"
-        echo "DMG_CHECKSUM=$(cat ${DMG_FILE}.sha256)" >> $GITHUB_ENV
+        # Find the DMG file created by the build script
+        DMG_FILE=$(find . -name "AVD-Manager-*.dmg" -type f | head -1)
+        if [[ -n "$DMG_FILE" ]]; then
+          echo "dmg_file=${DMG_FILE}" >> $GITHUB_OUTPUT
+          echo "dmg_basename=$(basename ${DMG_FILE})" >> $GITHUB_OUTPUT
+          # Get checksum if it exists, otherwise create it
+          if [[ -f "${DMG_FILE}.sha256" ]]; then
+            echo "DMG_CHECKSUM=$(cat ${DMG_FILE}.sha256)" >> $GITHUB_ENV
+          else
+            shasum -a 256 "$DMG_FILE" > "${DMG_FILE}.sha256"
+            echo "DMG_CHECKSUM=$(cat ${DMG_FILE}.sha256)" >> $GITHUB_ENV
+          fi
+        else
+          echo "Error: No DMG file found"
+          exit 1
+        fi
         
     - name: Create Release Notes
       run: |
@@ -166,8 +105,8 @@ jobs:
         name: AVD Manager v${{ steps.get_version.outputs.version }}
         body_path: release_notes.md
         files: |
-          AVD-Manager-${{ steps.get_version.outputs.version }}.dmg
-          AVD-Manager-${{ steps.get_version.outputs.version }}.dmg.sha256
+          ${{ steps.get_version.outputs.dmg_file }}
+          ${{ steps.get_version.outputs.dmg_file }}.sha256
         draft: false
         prerelease: ${{ steps.get_version.outputs.is_prerelease }}
       env:
@@ -176,7 +115,7 @@ jobs:
     - name: Upload DMG as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: AVD-Manager-${{ steps.get_version.outputs.version }}
+        name: ${{ steps.get_version.outputs.dmg_basename }}
         path: |
-          AVD-Manager-${{ steps.get_version.outputs.version }}.dmg
-          AVD-Manager-${{ steps.get_version.outputs.version }}.dmg.sha256
+          ${{ steps.get_version.outputs.dmg_file }}
+          ${{ steps.get_version.outputs.dmg_file }}.sha256
