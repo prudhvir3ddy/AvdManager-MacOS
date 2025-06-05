@@ -2,6 +2,9 @@
 
 A macOS status bar app for managing Android emulators with ease.
 
+![Screenshot 2025-06-06 at 2 22 53 AM](https://github.com/user-attachments/assets/4fc69a8e-ee4f-48db-b488-92edfe1fdd50)
+
+
 ## Features
 
 - 📱 **View all Android emulators** - Lists all available AVDs (Android Virtual Devices) on your system
@@ -22,18 +25,20 @@ A macOS status bar app for managing Android emulators with ease.
 
 ## Installation
 
-1. Clone this repository:
-   ```bash
-   git clone <repository-url>
-   cd avdmanager
-   ```
+### from releases 
 
-2. Open the project in Xcode:
+Find the latest DMG here, download, install and drag the AvdManager to the Applications folder
+
+https://github.com/prudhvir3ddy/AvdManager-MacOS/releases
+
+### from sources
+
+1. Open the project in Xcode:
    ```bash
    open avdmanager.xcodeproj
    ```
 
-3. Build and run the project (⌘+R)
+2. Build and run the project (⌘+R)
 
 ## Building & Releases
 
@@ -151,15 +156,12 @@ The app automatically searches for Android SDK tools in these locations:
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-[Your License Here]
+1. Raise an issue
+2. Fork the repository
+3. Create a feature branch
+4. Make your changes
+5. Test thoroughly
+6. Submit a pull request
 
 ## Credits
 
