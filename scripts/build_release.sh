@@ -67,46 +67,29 @@ clean_build() {
 build_app() {
     print_status "Building AVD Manager..."
     
+    # Build without signing for local development
     xcodebuild -project avdmanager.xcodeproj \
                -scheme avdmanager \
                -configuration Release \
                -derivedDataPath "$BUILD_DIR/" \
-               -archivePath "$BUILD_DIR/avdmanager.xcarchive" \
-               archive
+               CODE_SIGN_IDENTITY="" \
+               CODE_SIGNING_REQUIRED=NO \
+               build
                
     print_success "Build completed successfully"
 }
 
 # Export the app
 export_app() {
-    print_status "Exporting app..."
+    print_status "Copying built app..."
     
-    # Create export options plist
-    cat > ExportOptions.plist << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>method</key>
-    <string>development</string>
-    <key>stripSwiftSymbols</key>
-    <true/>
-    <key>thinning</key>
-    <string>&lt;none&gt;</string>
-</dict>
-</plist>
-EOF
+    # Create export directory
+    mkdir -p "$EXPORT_DIR"
     
-    # Export the app
-    xcodebuild -exportArchive \
-               -archivePath "$BUILD_DIR/avdmanager.xcarchive" \
-               -exportOptionsPlist ExportOptions.plist \
-               -exportPath "$EXPORT_DIR/"
-               
-    # Clean up export options
-    rm ExportOptions.plist
+    # Copy the built app directly from build products
+    cp -R "$BUILD_DIR/Build/Products/Release/avdmanager.app" "$EXPORT_DIR/"
     
-    print_success "Export completed"
+    print_success "App copied successfully"
 }
 
 # Create DMG
