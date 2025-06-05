@@ -1,0 +1,182 @@
+name: Build and Release AVD Manager
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0, v1.2.3, etc.
+  workflow_dispatch:  # Allow manual triggering
+
+env:
+  APP_NAME: "avdmanager"
+  DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+        
+    - name: Show Xcode version
+      run: xcodebuild -version
+      
+    - name: Clean build directory
+      run: rm -rf build/
+      
+    - name: Build app for Release
+      run: |
+        xcodebuild -project avdmanager.xcodeproj \
+                   -scheme avdmanager \
+                   -configuration Release \
+                   -derivedDataPath build/ \
+                   -archivePath build/avdmanager.xcarchive \
+                   archive
+                   
+    - name: Export app from archive
+      run: |
+        # Create export options plist
+        cat > ExportOptions.plist << EOF
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>method</key>
+            <string>developer-id</string>
+            <key>stripSwiftSymbols</key>
+            <true/>
+            <key>thinning</key>
+            <string>&lt;none&gt;</string>
+        </dict>
+        </plist>
+        EOF
+        
+        # Export the app
+        xcodebuild -exportArchive \
+                   -archivePath build/avdmanager.xcarchive \
+                   -exportOptionsPlist ExportOptions.plist \
+                   -exportPath build/export/
+                   
+    - name: Install create-dmg
+      run: brew install create-dmg
+      
+    - name: Create DMG
+      run: |
+        # Create a temporary directory for DMG contents
+        mkdir -p dmg-temp
+        
+        # Copy the app to the temp directory
+        cp -R build/export/avdmanager.app dmg-temp/
+        
+        # Create Applications symlink for USB cable installation
+        ln -s /Applications dmg-temp/Applications
+        
+        # Using default DMG background
+        echo "Using default DMG background"
+        
+        # Get version from git tag or use commit hash
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          VERSION=${GITHUB_REF#refs/tags/v}
+        else
+          VERSION=$(git rev-parse --short HEAD)
+        fi
+        
+        # Create the DMG with USB cable background
+        create-dmg \
+          --volname "AVD Manager" \
+          --volicon "avdmanager/Assets.xcassets/AppIcon.appiconset/icon_512x512.png" \
+          --window-pos 200 120 \
+          --window-size 600 360 \
+          --icon-size 72 \
+          --icon "avdmanager.app" 165 180 \
+          --icon "Applications" 435 180 \
+          --hide-extension "avdmanager.app" \
+          --text-size 14 \
+          --format ULFO \
+          --filesystem HFS+ \
+          --skip-jenkins \
+          --codesign "Apple Development: prudhvi.reddy@deliveroo.com (6GSKHWTHQ7)" \
+          "AVD-Manager-${VERSION}.dmg" \
+          "dmg-temp/"
+          
+    - name: Get version for release
+      id: get_version
+      run: |
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "is_prerelease=false" >> $GITHUB_OUTPUT
+        else
+          VERSION=$(git rev-parse --short HEAD)
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "tag=dev-${VERSION}" >> $GITHUB_OUTPUT
+          echo "is_prerelease=true" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Calculate DMG checksum
+      run: |
+        DMG_FILE="AVD-Manager-${{ steps.get_version.outputs.version }}.dmg"
+        shasum -a 256 "$DMG_FILE" > "${DMG_FILE}.sha256"
+        echo "DMG_CHECKSUM=$(cat ${DMG_FILE}.sha256)" >> $GITHUB_ENV
+        
+    - name: Create Release Notes
+      run: |
+        cat > release_notes.md << EOF
+        # AVD Manager v${{ steps.get_version.outputs.version }}
+        
+        A modern macOS status bar app for managing Android emulators.
+        
+        ## Features
+        - 📱 Launch and stop Android emulators from the status bar
+        - 🎯 Real-time emulator status detection
+        - 🎨 Professional JetBrains Toolbox-inspired interface
+        - ⚡ Fast and lightweight
+        - 🔍 Spotlight-searchable with custom app icon
+        
+        ## Installation
+        1. Download the DMG file below
+        2. Open the DMG and drag AVD Manager to Applications
+        3. Launch from Applications or Spotlight
+        
+        ## System Requirements
+        - macOS 15.4 or later
+        - Android SDK with emulator tools installed
+        - Xcode Command Line Tools (for Android development)
+        
+        ## Checksums
+        \`\`\`
+        ${{ env.DMG_CHECKSUM }}
+        \`\`\`
+        
+        ---
+        
+        **Note**: This app requires Android SDK tools to be installed and accessible in your PATH.
+        EOF
+        
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.get_version.outputs.tag }}
+        name: AVD Manager v${{ steps.get_version.outputs.version }}
+        body_path: release_notes.md
+        files: |
+          AVD-Manager-${{ steps.get_version.outputs.version }}.dmg
+          AVD-Manager-${{ steps.get_version.outputs.version }}.dmg.sha256
+        draft: false
+        prerelease: ${{ steps.get_version.outputs.is_prerelease }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Upload DMG as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: AVD-Manager-${{ steps.get_version.outputs.version }}
+        path: |
+          AVD-Manager-${{ steps.get_version.outputs.version }}.dmg
+          AVD-Manager-${{ steps.get_version.outputs.version }}.dmg.sha256
