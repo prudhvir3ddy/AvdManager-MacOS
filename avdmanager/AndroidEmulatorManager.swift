@@ -129,22 +129,83 @@ class AndroidEmulatorManager: ObservableObject {
         
         var emulators: [(name: String, device: String, apiLevel: String, target: String)] = []
         
+        // Try to get detailed info using avdmanager list avd
+        let avdManagerOutput = await executeCommand("avdmanager", arguments: ["list", "avd"])
+        let avdDetails = parseAVDManagerOutput(avdManagerOutput)
+        
         for line in lines {
             let name = line.trimmingCharacters(in: .whitespacesAndNewlines)
             
-            // Try to get config info from the AVD directory
-            let configPath = "\(NSHomeDirectory())/.android/avd/\(name).avd/config.ini"
-            let configContent = await readFile(at: configPath)
-            
-            let device = extractValue(from: configContent, key: "hw.device.name") ?? 
-                        extractValue(from: configContent, key: "hw.device.manufacturer") ?? "Unknown Device"
-            let apiLevel = extractValue(from: configContent, key: "image.sysdir.1")?.components(separatedBy: "/").last ?? "Unknown API"
-            let target = extractValue(from: configContent, key: "target") ?? "Unknown Target"
-            
-            emulators.append((name: name, device: device, apiLevel: apiLevel, target: target))
+            // First try to get info from avdmanager command
+            if let avdInfo = avdDetails[name] {
+                emulators.append((
+                    name: name,
+                    device: avdInfo.device,
+                    apiLevel: avdInfo.apiLevel,
+                    target: avdInfo.target
+                ))
+            } else {
+                // Fallback to config file parsing
+                let configPath = "\(NSHomeDirectory())/.android/avd/\(name).avd/config.ini"
+                let configContent = await readFile(at: configPath)
+                
+                let device = extractDeviceName(from: configContent)
+                let apiLevel = extractAPILevel(from: configContent, avdName: name)
+                let target = extractTarget(from: configContent, avdName: name)
+                
+                emulators.append((name: name, device: device, apiLevel: apiLevel, target: target))
+            }
         }
         
         return emulators
+    }
+    
+    private func parseAVDManagerOutput(_ output: String) -> [String: (device: String, apiLevel: String, target: String)] {
+        var avdDetails: [String: (device: String, apiLevel: String, target: String)] = [:]
+        
+        let lines = output.components(separatedBy: .newlines)
+        var currentAVD: String?
+        var currentDevice = "Unknown Device"
+        var currentAPI = "Unknown"
+        var currentTarget = "Android"
+        
+        for line in lines {
+            let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            if trimmedLine.hasPrefix("Name:") {
+                currentAVD = String(trimmedLine.dropFirst("Name:".count)).trimmingCharacters(in: .whitespacesAndNewlines)
+            } else if trimmedLine.hasPrefix("Device:") {
+                currentDevice = String(trimmedLine.dropFirst("Device:".count)).trimmingCharacters(in: .whitespacesAndNewlines)
+            } else if trimmedLine.hasPrefix("Target:") {
+                let targetString = String(trimmedLine.dropFirst("Target:".count)).trimmingCharacters(in: .whitespacesAndNewlines)
+                currentTarget = targetString
+                
+                // Extract API level from target string (e.g., "Google APIs (Google Inc.) - API Level 33")
+                if let apiRange = targetString.range(of: "API Level ") {
+                    let apiSubstring = targetString[apiRange.upperBound...]
+                    let apiComponents = apiSubstring.components(separatedBy: " ")
+                    if let firstComponent = apiComponents.first, Int(firstComponent) != nil {
+                        currentAPI = firstComponent
+                    }
+                }
+            } else if trimmedLine.contains("---------") && currentAVD != nil {
+                // End of current AVD block
+                if let avdName = currentAVD {
+                    avdDetails[avdName] = (device: currentDevice, apiLevel: currentAPI, target: currentTarget)
+                }
+                currentAVD = nil
+                currentDevice = "Unknown Device"
+                currentAPI = "Unknown"
+                currentTarget = "Android"
+            }
+        }
+        
+        // Handle last AVD if no separator line at the end
+        if let avdName = currentAVD {
+            avdDetails[avdName] = (device: currentDevice, apiLevel: currentAPI, target: currentTarget)
+        }
+        
+        return avdDetails
     }
     
     private func getRunningEmulatorNames() async -> Set<String> {
@@ -254,6 +315,96 @@ class AndroidEmulatorManager: ObservableObject {
             }
         }
         return nil
+    }
+    
+    private func extractDeviceName(from content: String) -> String {
+        // Try different device name keys
+        if let deviceName = extractValue(from: content, key: "hw.device.name") {
+            return deviceName
+        }
+        if let deviceManufacturer = extractValue(from: content, key: "hw.device.manufacturer") {
+            return deviceManufacturer
+        }
+        if let avdDisplayName = extractValue(from: content, key: "avd.ini.displayname") {
+            return avdDisplayName
+        }
+        return "Unknown Device"
+    }
+    
+    private func extractAPILevel(from content: String, avdName: String) -> String {
+        // Method 1: Try to extract from image.sysdir.1
+        if let sysDir = extractValue(from: content, key: "image.sysdir.1") {
+            let components = sysDir.components(separatedBy: "/")
+            for component in components {
+                if component.hasPrefix("android-") {
+                    let apiString = String(component.dropFirst("android-".count))
+                    if Int(apiString) != nil {
+                        return apiString
+                    }
+                }
+            }
+        }
+        
+        // Method 2: Try target
+        if let target = extractValue(from: content, key: "target") {
+            if target.hasPrefix("android-") {
+                let apiString = String(target.dropFirst("android-".count))
+                if Int(apiString) != nil {
+                    return apiString
+                }
+            }
+        }
+        
+        // Method 3: Try tag.id combined with tag.display
+        if let tagId = extractValue(from: content, key: "tag.id"),
+           let tagDisplay = extractValue(from: content, key: "tag.display") {
+            if tagDisplay.contains("API") {
+                let components = tagDisplay.components(separatedBy: " ")
+                for component in components {
+                    if Int(component) != nil {
+                        return component
+                    }
+                }
+            }
+        }
+        
+        // Method 4: Try PlayStore tag approach
+        if let playStoreTag = extractValue(from: content, key: "PlayStore.enabled") {
+            // If PlayStore is enabled, it's likely a Google APIs version
+            if let target = extractValue(from: content, key: "target") {
+                return target.replacingOccurrences(of: "android-", with: "")
+            }
+        }
+        
+        return "Unknown"
+    }
+    
+    private func extractTarget(from content: String, avdName: String) -> String {
+        // Try to get a human-readable target name
+        if let target = extractValue(from: content, key: "target") {
+            if target.hasPrefix("android-") {
+                let apiLevel = String(target.dropFirst("android-".count))
+                
+                // Check if it has Google APIs
+                if let tagId = extractValue(from: content, key: "tag.id") {
+                    if tagId.contains("google_apis") {
+                        return "Android \(apiLevel) (Google APIs)"
+                    } else if tagId.contains("playstore") || tagId.contains("google_apis_playstore") {
+                        return "Android \(apiLevel) (Google Play)"
+                    }
+                }
+                
+                return "Android \(apiLevel)"
+            }
+            return target
+        }
+        
+        // Fallback to tag display if available
+        if let tagDisplay = extractValue(from: content, key: "tag.display") {
+            return tagDisplay
+        }
+        
+        return "Android"
     }
     
     @discardableResult
