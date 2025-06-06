@@ -2,7 +2,7 @@
 
 A macOS status bar app for managing Android emulators with ease.
 
-![Screenshot 2025-06-06 at 2 22 53 AM](https://github.com/user-attachments/assets/4fc69a8e-ee4f-48db-b488-92edfe1fdd50)
+<img width="482" alt="Screenshot 2025-06-06 at 1 13 20 PM" src="https://github.com/user-attachments/assets/854ca7e0-a9bb-4736-b515-c1930aba05b9" />
 
 
 ## Features
