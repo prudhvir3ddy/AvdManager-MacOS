@@ -22,6 +22,9 @@ class AndroidEmulatorManager: ObservableObject {
     @Published var isLoading = false
     
     private var cancellables = Set<AnyCancellable>()
+    private var settingsManager: SettingsManager {
+        return SettingsManager.shared
+    }
     
     init() {
         loadEmulators()
@@ -417,31 +420,44 @@ class AndroidEmulatorManager: ObservableObject {
             process.standardError = pipe
             process.arguments = arguments
             
-            // Find the command in common paths
-            let possiblePaths = [
-                "/usr/local/bin/\(command)",
-                "/opt/homebrew/bin/\(command)",
-                "/usr/bin/\(command)",
-                "\(NSHomeDirectory())/Library/Android/sdk/emulator/\(command)",
-                "\(NSHomeDirectory())/Library/Android/sdk/tools/bin/\(command)",
-                "\(NSHomeDirectory())/Library/Android/sdk/cmdline-tools/latest/bin/\(command)",
-                "\(NSHomeDirectory())/Library/Android/sdk/platform-tools/\(command)",
-                "\(NSHomeDirectory())/Android/Sdk/emulator/\(command)",
-                "\(NSHomeDirectory())/Android/Sdk/tools/bin/\(command)",
-                "\(NSHomeDirectory())/Android/Sdk/cmdline-tools/latest/bin/\(command)",
-                "\(NSHomeDirectory())/Android/Sdk/platform-tools/\(command)"
-            ]
-            
+            // Get command path from SettingsManager first, then fallback to system paths
             var commandPath: String?
-            for path in possiblePaths {
-                if FileManager.default.fileExists(atPath: path) {
-                    commandPath = path
-                    break
+            
+            switch command {
+            case "emulator":
+                commandPath = settingsManager.getEmulatorPath()
+                if commandPath?.isEmpty == true {
+                    commandPath = nil
+                }
+            case "adb":
+                commandPath = settingsManager.getADBPath()
+                if commandPath?.isEmpty == true {
+                    commandPath = nil
+                }
+            case "avdmanager":
+                commandPath = settingsManager.getAVDManagerPath()
+                if commandPath?.isEmpty == true {
+                    commandPath = nil
+                }
+            default:
+                // For system commands like ps, kill, etc., use system paths
+                let possiblePaths = [
+                    "/usr/local/bin/\(command)",
+                    "/opt/homebrew/bin/\(command)",
+                    "/usr/bin/\(command)",
+                    "/bin/\(command)"
+                ]
+                
+                for path in possiblePaths {
+                    if FileManager.default.fileExists(atPath: path) {
+                        commandPath = path
+                        break
+                    }
                 }
             }
             
             // If not found in specific paths, try using 'which' command
-            if commandPath == nil {
+            if commandPath == nil || commandPath == command {
                 let whichProcess = Process()
                 whichProcess.executableURL = URL(fileURLWithPath: "/usr/bin/which")
                 whichProcess.arguments = [command]

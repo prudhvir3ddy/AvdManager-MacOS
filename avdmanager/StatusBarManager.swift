@@ -61,6 +61,7 @@ struct StatusBarContentView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var hoveredEmulator: String? = nil
     @State private var isRefreshing = false
+    @State private var showingSettings = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -186,6 +187,18 @@ struct StatusBarContentView: View {
                 
                 Spacer()
                 
+                Button("Settings") {
+                    showingSettings = true
+                }
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(.secondary)
+                .buttonStyle(PlainButtonStyle())
+                
+                Text("•")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.secondary.opacity(0.5))
+                    .padding(.horizontal, 4)
+                
                 Button("Quit") {
                     NSApplication.shared.terminate(nil)
                 }
@@ -210,6 +223,9 @@ struct StatusBarContentView: View {
                       Color(NSColor.windowBackgroundColor))
         )
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .sheet(isPresented: $showingSettings) {
+            SettingsView()
+        }
     }
     
     private func refreshEmulators() {
@@ -220,6 +236,8 @@ struct StatusBarContentView: View {
             isRefreshing = false
         }
     }
+    
+
 }
 
 // MARK: - Toolbox Style Emulator Row

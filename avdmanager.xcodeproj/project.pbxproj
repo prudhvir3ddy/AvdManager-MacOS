@@ -12,7 +12,8 @@
 		A45286472DF2180400CAD647 /* AndroidEmulatorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45286482DF2180400CAD647 /* AndroidEmulatorManager.swift */; };
 		A45286492DF2180400CAD647 /* StatusBarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A452864A2DF2180400CAD647 /* StatusBarManager.swift */; };
 		A452864B2DF2180400CAD647 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A452864C2DF2180400CAD647 /* Assets.xcassets */; };
-
+		A452864F2DF2180400CAD647 /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45286502DF2180400CAD647 /* SettingsManager.swift */; };
+		A45286512DF2180400CAD647 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45286522DF2180400CAD647 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +24,8 @@
 		A452864A2DF2180400CAD647 /* StatusBarManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusBarManager.swift; sourceTree = "<group>"; };
 		A452864C2DF2180400CAD647 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A452864E2DF2180500CAD647 /* avdmanager.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = avdmanager.entitlements; sourceTree = "<group>"; };
+		A45286502DF2180400CAD647 /* SettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
+		A45286522DF2180400CAD647 /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +62,8 @@
 				A45286462DF2180400CAD647 /* ContentView.swift */,
 				A45286482DF2180400CAD647 /* AndroidEmulatorManager.swift */,
 				A452864A2DF2180400CAD647 /* StatusBarManager.swift */,
+				A45286502DF2180400CAD647 /* SettingsManager.swift */,
+				A45286522DF2180400CAD647 /* SettingsView.swift */,
 				A452864C2DF2180400CAD647 /* Assets.xcassets */,
 				A452864E2DF2180500CAD647 /* avdmanager.entitlements */,
 			);
@@ -138,6 +143,8 @@
 				A45286452DF2180400CAD647 /* ContentView.swift in Sources */,
 				A45286472DF2180400CAD647 /* AndroidEmulatorManager.swift in Sources */,
 				A45286492DF2180400CAD647 /* StatusBarManager.swift in Sources */,
+				A452864F2DF2180400CAD647 /* SettingsManager.swift in Sources */,
+				A45286512DF2180400CAD647 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,11 +275,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = avdmanager/avdmanager.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = 6GSKHWTHQ7;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -286,6 +293,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.prudhvi.avdmanager;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -297,11 +305,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = avdmanager/avdmanager.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = 6GSKHWTHQ7;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -315,6 +323,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.prudhvi.avdmanager;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -344,4 +353,4 @@
 /* End XCConfigurationList section */
 	};
 	rootObject = A45286382DF2180300CAD647 /* Project object */;
-} 
+}
