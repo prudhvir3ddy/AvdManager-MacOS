@@ -27,9 +27,20 @@ A macOS status bar app for managing Android emulators with ease.
 
 ### from releases 
 
-Find the latest DMG here, download, install and drag the AvdManager to the Applications folder
+- Find the latest DMG [here](https://github.com/prudhvir3ddy/AvdManager-MacOS/releases)
+- Download
+- Double click to install and drag the AvdManager to the Applications folder
 
-https://github.com/prudhvir3ddy/AvdManager-MacOS/releases
+When you try to run, you will face this error because I didn't pay $99 to Apple
+
+![Screenshot 2025-06-06 at 9 44 21 AM](https://github.com/user-attachments/assets/ed252708-8819-45d5-805d-734596d6840b)
+
+Click on cancel and run this command in the terminal 
+
+```bash
+xattr -rd com.apple.quarantine /Applications/avdmanager.app/
+```
+
 
 ### from sources
 
@@ -100,26 +111,6 @@ Each release includes:
 4. **Stop an emulator** - Click the red "Stop" button next to any running emulator
 5. **Refresh the list** - Click the refresh icon to update the emulator status
 6. **Quit the app** - Click "Quit" at the bottom of the popover
-
-## Architecture
-
-The app consists of several key components:
-
-### `AndroidEmulatorManager.swift`
-- Core business logic for interacting with Android emulators
-- Executes command-line tools (`emulator`, `adb`, `avdmanager`)
-- Manages emulator state and provides async operations
-- Automatically discovers Android SDK installation paths
-
-### `StatusBarManager.swift`
-- Handles macOS status bar integration
-- Creates and manages the popover UI
-- Provides the main user interface components
-
-### `avdmanagerApp.swift`
-- Main app entry point
-- Configures the app as a status bar accessory (no dock icon)
-- Sets up the app lifecycle
 
 ## Technical Details
 
