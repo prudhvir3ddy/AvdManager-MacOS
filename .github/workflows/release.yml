@@ -64,38 +64,64 @@ jobs:
           exit 1
         fi
         
-    - name: Create Release Notes
+    - name: Generate Release Notes from Commits
       run: |
+        # Get current and previous tags
+        CURRENT_TAG="${{ steps.get_version.outputs.tag }}"
+        PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+        
+        # If no previous tag, use initial commit
+        if [ -z "$PREVIOUS_TAG" ]; then
+          PREVIOUS_TAG=$(git rev-list --max-parents=0 HEAD)
+        fi
+        
+        echo "Generating release notes from $PREVIOUS_TAG to $CURRENT_TAG"
+        
+        # Generate commit log
+        COMMIT_LOG=$(git log $PREVIOUS_TAG..HEAD --oneline --no-merges --pretty=format:"- %s" 2>/dev/null || git log --oneline --no-merges --pretty=format:"- %s")
+        
+        # Count commits
+        COMMIT_COUNT=$(echo "$COMMIT_LOG" | wc -l | tr -d ' ')
+        
+        # Generate release notes
         cat > release_notes.md << EOF
         # AVD Manager v${{ steps.get_version.outputs.version }}
         
         A modern macOS status bar app for managing Android emulators.
         
-        ## Features
+        ## What's Changed in this Release
+        
+        $COMMIT_LOG
+        
+        **$COMMIT_COUNT commits** since previous release
+        
+        ## Quick Start
+        1. Download the DMG file below
+        2. Open the DMG and drag AVD Manager to Applications  
+        3. Launch from Applications or Spotlight
+        4. Access Settings to configure your Android SDK path
+        
+        ## System Requirements
+        - macOS 14.0 or later (Universal Binary: Intel & Apple Silicon)
+        - Android SDK with emulator tools installed
+        - Xcode Command Line Tools (for Android development)
+        
+        ## Key Features
         - 📱 Launch and stop Android emulators from the status bar
-        - 🎯 Real-time emulator status detection
+        - ⚙️ Configurable Android SDK path in Settings
+        - 🎯 Real-time emulator status detection  
         - 🎨 Professional JetBrains Toolbox-inspired interface
         - ⚡ Fast and lightweight
         - 🔍 Spotlight-searchable with custom app icon
         
-        ## Installation
-        1. Download the DMG file below
-        2. Open the DMG and drag AVD Manager to Applications
-        3. Launch from Applications or Spotlight
-        
-        ## System Requirements
-        - macOS 15.4 or later
-        - Android SDK with emulator tools installed
-        - Xcode Command Line Tools (for Android development)
-        
-        ## Checksums
+        ## File Verification
         \`\`\`
         ${{ env.DMG_CHECKSUM }}
         \`\`\`
         
         ---
         
-        **Note**: This app requires Android SDK tools to be installed and accessible in your PATH.
+        **Note**: This app requires Android SDK tools to be installed and accessible in your PATH. Use Settings to configure custom SDK locations.
         EOF
         
     - name: Create GitHub Release
