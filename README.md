@@ -41,6 +41,8 @@ Click on cancel and run this command in the terminal
 xattr -rd com.apple.quarantine /Applications/avdmanager.app/
 ```
 
+Now you can open the app, and it will work as usual.
+
 
 ### from sources
 
