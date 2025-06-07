@@ -323,7 +323,7 @@ final class AndroidEmulatorManager: EmulatorManaging {
     // MARK: - Private Methods
     
     private func getAvailableEmulators() async -> [(name: String, device: String, apiLevel: String, target: String)] {
-        print("🔧 Getting available emulators (FAST MODE)...")
+        print("🔧 Getting available emulators...")
         
         print("🔧 Executing: emulator -list-avds")
         let output = await commandService.executeCommand("emulator", arguments: ["-list-avds"])
@@ -338,46 +338,144 @@ final class AndroidEmulatorManager: EmulatorManaging {
             return []
         }
         
-        // FAST MODE: Just return basic info, no detailed parsing
+        // Read detailed info from AVD config files
         for line in lines {
             let name = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            print("📱 Processing emulator: \(name)")
             
-            // Try to extract basic info from the name if possible
-            var apiLevel = "Unknown"
-            var device = "Android Device"
-            
-            // Quick API level extraction from common naming patterns
-            if name.contains("API_") {
-                let components = name.components(separatedBy: "_")
-                for (index, component) in components.enumerated() {
-                    if component == "API", index + 1 < components.count {
-                        apiLevel = components[index + 1]
-                        break
-                    }
-                }
-            }
-            
-            // Quick device type detection
-            if name.lowercased().contains("phone") {
-                device = "Phone"
-            } else if name.lowercased().contains("tablet") {
-                device = "Tablet"
-            } else if name.lowercased().contains("tv") {
-                device = "TV"
-            } else if name.lowercased().contains("wear") {
-                device = "Wear OS"
-            }
+            let (apiLevel, target, device) = await getEmulatorDetails(name: name)
             
             emulators.append((
                 name: name,
                 device: device,
                 apiLevel: apiLevel,
-                target: "Android \(apiLevel)"
+                target: target
             ))
+            
+            print("📱 \(name): API \(apiLevel), Device: \(device)")
         }
         
-        print("✅ Returning \(emulators.count) emulators (FAST)")
+        print("✅ Returning \(emulators.count) emulators with detailed info")
         return emulators
+    }
+    
+    private func getEmulatorDetails(name: String) async -> (apiLevel: String, target: String, device: String) {
+        // First try to read from AVD config file
+        let homeDir = NSHomeDirectory()
+        let configPath = "\(homeDir)/.android/avd/\(name).avd/config.ini"
+        
+        print("🔍 Reading config from: \(configPath)")
+        
+        // Try to read the config file
+        let configContent = await readConfigFile(at: configPath)
+        
+        if !configContent.isEmpty {
+            let (apiLevel, target, device) = parseConfigFile(configContent, avdName: name)
+            if apiLevel != "Unknown" {
+                return (apiLevel, target, device)
+            }
+        }
+        
+        // Fallback: Try to extract from name
+        var apiLevel = "Unknown"
+        var device = "Android Device"
+        
+        // Quick API level extraction from common naming patterns
+        if name.contains("API_") {
+            let components = name.components(separatedBy: "_")
+            for (index, component) in components.enumerated() {
+                if component == "API", index + 1 < components.count {
+                    apiLevel = components[index + 1]
+                    break
+                }
+            }
+        }
+        
+        // Quick device type detection
+        if name.lowercased().contains("phone") {
+            device = "Phone"
+        } else if name.lowercased().contains("tablet") {
+            device = "Tablet"
+        } else if name.lowercased().contains("tv") {
+            device = "TV"
+        } else if name.lowercased().contains("wear") {
+            device = "Wear OS"
+        } else if name.lowercased().contains("pixel") {
+            device = "Pixel Device"
+        } else if name.lowercased().contains("medium") {
+            device = "Medium Phone"
+        }
+        
+        let target = apiLevel != "Unknown" ? "Android \(apiLevel)" : "Android"
+        print("🔍 Fallback parsing for \(name): API \(apiLevel), Device: \(device)")
+        
+        return (apiLevel, target, device)
+    }
+    
+    private func parseConfigFile(_ content: String, avdName: String) -> (apiLevel: String, target: String, device: String) {
+        let lines = content.components(separatedBy: .newlines)
+        var apiLevel = "Unknown"
+        var target = "Android"
+        var device = "Android Device"
+        
+        for line in lines {
+            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            if trimmed.hasPrefix("target=android-") {
+                // Extract API level from target=android-XX
+                let targetValue = String(trimmed.dropFirst("target=android-".count))
+                apiLevel = targetValue
+                target = "Android \(targetValue)"
+                print("✅ Found API level \(apiLevel) from target line")
+            } else if trimmed.hasPrefix("hw.device.name=") {
+                // Extract device name
+                let deviceValue = String(trimmed.dropFirst("hw.device.name=".count))
+                device = deviceValue.isEmpty ? "Android Device" : deviceValue
+                print("✅ Found device: \(device)")
+            }
+        }
+        
+        // If still unknown, try to extract from system image path
+        if apiLevel == "Unknown" {
+            for line in lines {
+                let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                if trimmed.hasPrefix("image.sysdir.1=system-images/android-") {
+                    // Extract from path like: system-images/android-34/google_apis/arm64-v8a/
+                    let pathComponents = trimmed.components(separatedBy: "/")
+                    for component in pathComponents {
+                        if component.hasPrefix("android-") {
+                            apiLevel = String(component.dropFirst("android-".count))
+                            target = "Android \(apiLevel)"
+                            print("✅ Found API level \(apiLevel) from system image path")
+                            break
+                        }
+                    }
+                }
+            }
+        }
+        
+        return (apiLevel, target, device)
+    }
+    
+    private func readConfigFile(at path: String) async -> String {
+        // Try using the commandService readFile method first
+        let content = await commandService.readFile(at: path)
+        if !content.isEmpty {
+            return content
+        }
+        
+        // Fallback: Use FileManager directly
+        return await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .background).async {
+                do {
+                    let content = try String(contentsOfFile: path, encoding: .utf8)
+                    continuation.resume(returning: content)
+                } catch {
+                    print("⚠️ Failed to read config file \(path): \(error)")
+                    continuation.resume(returning: "")
+                }
+            }
+        }
     }
     
     private func getRunningEmulatorNames() async -> Set<String> {

@@ -21,6 +21,7 @@ protocol EmulatorManaging: ObservableObject {
 protocol CommandExecuting {
     func executeCommand(_ command: String, arguments: [String], background: Bool) async -> String
     func executeCommand(_ command: String, arguments: [String]) async -> String
+    func readFile(at path: String) async -> String
 }
 
 protocol SettingsManaging: ObservableObject {
