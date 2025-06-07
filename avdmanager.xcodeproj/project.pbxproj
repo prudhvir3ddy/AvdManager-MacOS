@@ -7,25 +7,39 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A45286432DF2180400CAD647 /* avdmanagerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45286442DF2180400CAD647 /* avdmanagerApp.swift */; };
-		A45286452DF2180400CAD647 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45286462DF2180400CAD647 /* ContentView.swift */; };
-		A45286472DF2180400CAD647 /* AndroidEmulatorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45286482DF2180400CAD647 /* AndroidEmulatorManager.swift */; };
-		A45286492DF2180400CAD647 /* StatusBarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A452864A2DF2180400CAD647 /* StatusBarManager.swift */; };
 		A452864B2DF2180400CAD647 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A452864C2DF2180400CAD647 /* Assets.xcassets */; };
-		A452864F2DF2180400CAD647 /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45286502DF2180400CAD647 /* SettingsManager.swift */; };
-		A45286512DF2180400CAD647 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45286522DF2180400CAD647 /* SettingsView.swift */; };
+		A4A65DF22DF3348200F1C2AD /* Emulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A65DE52DF3348200F1C2AD /* Emulator.swift */; };
+		A4A65DF32DF3348200F1C2AD /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A65DE22DF3348200F1C2AD /* SettingsManager.swift */; };
+		A4A65DF42DF3348200F1C2AD /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A65DEA2DF3348200F1C2AD /* LoadingView.swift */; };
+		A4A65DF52DF3348200F1C2AD /* CommandService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A65DE72DF3348200F1C2AD /* CommandService.swift */; };
+		A4A65DF62DF3348200F1C2AD /* ToolboxStyleEmulatorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A65DEB2DF3348200F1C2AD /* ToolboxStyleEmulatorRow.swift */; };
+		A4A65DF72DF3348200F1C2AD /* StatusBarContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A65DEF2DF3348200F1C2AD /* StatusBarContentView.swift */; };
+		A4A65DF82DF3348200F1C2AD /* AVDManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A65DDC2DF3348200F1C2AD /* AVDManagerError.swift */; };
+		A4A65DF92DF3348200F1C2AD /* EmulatorManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A65DDE2DF3348200F1C2AD /* EmulatorManaging.swift */; };
+		A4A65DFA2DF3348200F1C2AD /* StatusBarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A65DE32DF3348200F1C2AD /* StatusBarManager.swift */; };
+		A4A65DFB2DF3348200F1C2AD /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A65DE92DF3348200F1C2AD /* EmptyStateView.swift */; };
+		A4A65DFC2DF3348200F1C2AD /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A65DED2DF3348200F1C2AD /* SettingsView.swift */; };
+		A4A65DFD2DF3348200F1C2AD /* AndroidEmulatorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A65DE12DF3348200F1C2AD /* AndroidEmulatorManager.swift */; };
+		A4A65DFF2DF3377800F1C2AD /* avdmanagerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A65DFE2DF335A100F1C2AD /* avdmanagerApp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A45286402DF2180300CAD647 /* avdmanager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = avdmanager.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A45286442DF2180400CAD647 /* avdmanagerApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = avdmanagerApp.swift; sourceTree = "<group>"; };
-		A45286462DF2180400CAD647 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		A45286482DF2180400CAD647 /* AndroidEmulatorManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AndroidEmulatorManager.swift; sourceTree = "<group>"; };
-		A452864A2DF2180400CAD647 /* StatusBarManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusBarManager.swift; sourceTree = "<group>"; };
 		A452864C2DF2180400CAD647 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A452864E2DF2180500CAD647 /* avdmanager.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = avdmanager.entitlements; sourceTree = "<group>"; };
-		A45286502DF2180400CAD647 /* SettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
-		A45286522DF2180400CAD647 /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A4A65DDC2DF3348200F1C2AD /* AVDManagerError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVDManagerError.swift; sourceTree = "<group>"; };
+		A4A65DDE2DF3348200F1C2AD /* EmulatorManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmulatorManaging.swift; sourceTree = "<group>"; };
+		A4A65DE12DF3348200F1C2AD /* AndroidEmulatorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AndroidEmulatorManager.swift; sourceTree = "<group>"; };
+		A4A65DE22DF3348200F1C2AD /* SettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
+		A4A65DE32DF3348200F1C2AD /* StatusBarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarManager.swift; sourceTree = "<group>"; };
+		A4A65DE52DF3348200F1C2AD /* Emulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emulator.swift; sourceTree = "<group>"; };
+		A4A65DE72DF3348200F1C2AD /* CommandService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandService.swift; sourceTree = "<group>"; };
+		A4A65DE92DF3348200F1C2AD /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		A4A65DEA2DF3348200F1C2AD /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		A4A65DEB2DF3348200F1C2AD /* ToolboxStyleEmulatorRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolboxStyleEmulatorRow.swift; sourceTree = "<group>"; };
+		A4A65DED2DF3348200F1C2AD /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A4A65DEF2DF3348200F1C2AD /* StatusBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarContentView.swift; sourceTree = "<group>"; };
+		A4A65DFE2DF335A100F1C2AD /* avdmanagerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = avdmanagerApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,16 +72,103 @@
 		A45286422DF2180400CAD647 /* avdmanager */ = {
 			isa = PBXGroup;
 			children = (
-				A45286442DF2180400CAD647 /* avdmanagerApp.swift */,
-				A45286462DF2180400CAD647 /* ContentView.swift */,
-				A45286482DF2180400CAD647 /* AndroidEmulatorManager.swift */,
-				A452864A2DF2180400CAD647 /* StatusBarManager.swift */,
-				A45286502DF2180400CAD647 /* SettingsManager.swift */,
-				A45286522DF2180400CAD647 /* SettingsView.swift */,
+				A4A65DE02DF3348200F1C2AD /* Core */,
+				A4A65DE42DF3348200F1C2AD /* Managers */,
+				A4A65DE62DF3348200F1C2AD /* Models */,
+				A4A65DE82DF3348200F1C2AD /* Services */,
+				A4A65DF12DF3348200F1C2AD /* Views */,
 				A452864C2DF2180400CAD647 /* Assets.xcassets */,
 				A452864E2DF2180500CAD647 /* avdmanager.entitlements */,
+				A4A65DFE2DF335A100F1C2AD /* avdmanagerApp.swift */,
 			);
 			path = avdmanager;
+			sourceTree = "<group>";
+		};
+		A4A65DDD2DF3348200F1C2AD /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				A4A65DDC2DF3348200F1C2AD /* AVDManagerError.swift */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		A4A65DDF2DF3348200F1C2AD /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				A4A65DDE2DF3348200F1C2AD /* EmulatorManaging.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
+		A4A65DE02DF3348200F1C2AD /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				A4A65DDD2DF3348200F1C2AD /* Errors */,
+				A4A65DDF2DF3348200F1C2AD /* Protocols */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		A4A65DE42DF3348200F1C2AD /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				A4A65DE12DF3348200F1C2AD /* AndroidEmulatorManager.swift */,
+				A4A65DE22DF3348200F1C2AD /* SettingsManager.swift */,
+				A4A65DE32DF3348200F1C2AD /* StatusBarManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		A4A65DE62DF3348200F1C2AD /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A4A65DE52DF3348200F1C2AD /* Emulator.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A4A65DE82DF3348200F1C2AD /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A4A65DE72DF3348200F1C2AD /* CommandService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A4A65DEC2DF3348200F1C2AD /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				A4A65DE92DF3348200F1C2AD /* EmptyStateView.swift */,
+				A4A65DEA2DF3348200F1C2AD /* LoadingView.swift */,
+				A4A65DEB2DF3348200F1C2AD /* ToolboxStyleEmulatorRow.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		A4A65DEE2DF3348200F1C2AD /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A4A65DED2DF3348200F1C2AD /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		A4A65DF02DF3348200F1C2AD /* StatusBar */ = {
+			isa = PBXGroup;
+			children = (
+				A4A65DEF2DF3348200F1C2AD /* StatusBarContentView.swift */,
+			);
+			path = StatusBar;
+			sourceTree = "<group>";
+		};
+		A4A65DF12DF3348200F1C2AD /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A4A65DEC2DF3348200F1C2AD /* Components */,
+				A4A65DEE2DF3348200F1C2AD /* Settings */,
+				A4A65DF02DF3348200F1C2AD /* StatusBar */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -98,7 +199,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1630;
 				TargetAttributes = {
 					A452863F2DF2180300CAD647 = {
 						CreatedOnToolsVersion = 15.0;
@@ -139,12 +240,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A45286432DF2180400CAD647 /* avdmanagerApp.swift in Sources */,
-				A45286452DF2180400CAD647 /* ContentView.swift in Sources */,
-				A45286472DF2180400CAD647 /* AndroidEmulatorManager.swift in Sources */,
-				A45286492DF2180400CAD647 /* StatusBarManager.swift in Sources */,
-				A452864F2DF2180400CAD647 /* SettingsManager.swift in Sources */,
-				A45286512DF2180400CAD647 /* SettingsView.swift in Sources */,
+				A4A65DFF2DF3377800F1C2AD /* avdmanagerApp.swift in Sources */,
+				A4A65DF22DF3348200F1C2AD /* Emulator.swift in Sources */,
+				A4A65DF32DF3348200F1C2AD /* SettingsManager.swift in Sources */,
+				A4A65DF42DF3348200F1C2AD /* LoadingView.swift in Sources */,
+				A4A65DF52DF3348200F1C2AD /* CommandService.swift in Sources */,
+				A4A65DF62DF3348200F1C2AD /* ToolboxStyleEmulatorRow.swift in Sources */,
+				A4A65DF72DF3348200F1C2AD /* StatusBarContentView.swift in Sources */,
+				A4A65DF82DF3348200F1C2AD /* AVDManagerError.swift in Sources */,
+				A4A65DF92DF3348200F1C2AD /* EmulatorManaging.swift in Sources */,
+				A4A65DFA2DF3348200F1C2AD /* StatusBarManager.swift in Sources */,
+				A4A65DFB2DF3348200F1C2AD /* EmptyStateView.swift in Sources */,
+				A4A65DFC2DF3348200F1C2AD /* SettingsView.swift in Sources */,
+				A4A65DFD2DF3348200F1C2AD /* AndroidEmulatorManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +293,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -248,6 +357,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -278,6 +388,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -308,6 +419,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;

@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class SettingsManager: ObservableObject {
+final class SettingsManager: SettingsManaging {
     static let shared = SettingsManager()
     
     @Published var androidSDKPath: String = ""
@@ -20,53 +20,23 @@ class SettingsManager: ObservableObject {
         loadSettings()
     }
     
-    private func loadSettings() {
-        // Load Android SDK path from UserDefaults or auto-detect
-        do {
-            if let savedPath = userDefaults.string(forKey: androidSDKPathKey), !savedPath.isEmpty {
-                androidSDKPath = savedPath
-            } else {
-                androidSDKPath = autoDetectAndroidSDK()
-            }
-        } catch {
-            print("Error loading settings: \(error)")
-            androidSDKPath = autoDetectAndroidSDK()
-        }
-    }
-    
-    func saveSettings() {
-        do {
-            userDefaults.set(androidSDKPath, forKey: androidSDKPathKey)
-        } catch {
-            print("Error saving settings: \(error)")
-        }
-    }
-    
-    func setAndroidSDKPath(_ path: String) {
-        androidSDKPath = path.trimmingCharacters(in: .whitespacesAndNewlines)
-        saveSettings()
-    }
+    // MARK: - SettingsManaging Protocol
     
     func validateAndroidSDKPath(_ path: String) -> Bool {
         let trimmedPath = path.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedPath.isEmpty else { return false }
         
-        // Check if the path exists and contains expected Android SDK components
         let fileManager = FileManager.default
         
-        // Check for essential SDK directories/files
-        let requiredPaths = [
-            "\(trimmedPath)/emulator",
-            "\(trimmedPath)/platform-tools",
-            "\(trimmedPath)/tools",
-            "\(trimmedPath)/cmdline-tools"
-        ]
+        // Check for essential SDK executables
+        let emulatorExists = fileManager.fileExists(atPath: "\(trimmedPath)/emulator/emulator")
+        let adbExists = fileManager.fileExists(atPath: "\(trimmedPath)/platform-tools/adb")
         
-        // At least emulator and platform-tools should exist
-        let emulatorExists = fileManager.fileExists(atPath: "\(trimmedPath)/emulator")
-        let platformToolsExists = fileManager.fileExists(atPath: "\(trimmedPath)/platform-tools")
+        print("🔍 Validating SDK path: \(trimmedPath)")
+        print("🔍 Emulator exists: \(emulatorExists) at \(trimmedPath)/emulator/emulator")
+        print("🔍 ADB exists: \(adbExists) at \(trimmedPath)/platform-tools/adb")
         
-        return emulatorExists || platformToolsExists
+        return emulatorExists && adbExists
     }
     
     func autoDetectAndroidSDK() -> String {
@@ -75,15 +45,19 @@ class SettingsManager: ObservableObject {
             "\(NSHomeDirectory())/Android/Sdk",
             "/usr/local/android-sdk",
             "/opt/android-sdk",
-            "/Applications/Android\\ Studio.app/Contents/android-sdk"
+            "/Applications/Android Studio.app/Contents/android-sdk"
         ]
         
+        print("🔍 Auto-detecting Android SDK...")
         for path in possiblePaths {
+            print("🔍 Checking: \(path)")
             if validateAndroidSDKPath(path) {
+                print("✅ Found Android SDK at: \(path)")
                 return path
             }
         }
         
+        print("❌ Android SDK not found in any common location")
         return ""
     }
     
@@ -100,7 +74,6 @@ class SettingsManager: ObservableObject {
     func getAVDManagerPath() -> String {
         guard !androidSDKPath.isEmpty else { return "avdmanager" }
         
-        // Try different possible locations
         let possiblePaths = [
             "\(androidSDKPath)/cmdline-tools/latest/bin/avdmanager",
             "\(androidSDKPath)/tools/bin/avdmanager"
@@ -118,5 +91,30 @@ class SettingsManager: ObservableObject {
     func resetToDefaults() {
         androidSDKPath = autoDetectAndroidSDK()
         saveSettings()
+    }
+    
+    func saveSettings() {
+        userDefaults.set(androidSDKPath, forKey: androidSDKPathKey)
+    }
+    
+    // MARK: - Public Methods
+    
+    func setAndroidSDKPath(_ path: String) {
+        androidSDKPath = path.trimmingCharacters(in: .whitespacesAndNewlines)
+        saveSettings()
+    }
+    
+    // MARK: - Private Methods
+    
+    private func loadSettings() {
+        if let savedPath = userDefaults.string(forKey: androidSDKPathKey), !savedPath.isEmpty {
+            androidSDKPath = savedPath
+        } else {
+            androidSDKPath = autoDetectAndroidSDK()
+        }
+        
+        print("🔧 SettingsManager loaded SDK path: '\(androidSDKPath)'")
+        print("🔧 Emulator path: '\(getEmulatorPath())'")
+        print("🔧 ADB path: '\(getADBPath())'")
     }
 } 
