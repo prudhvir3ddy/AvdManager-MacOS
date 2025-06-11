@@ -67,6 +67,18 @@ class AndroidEmulatorManager: ObservableObject {
         }
     }
     
+    func startEmulatorCold(_ emulator: Emulator) {
+        Task {
+            await executeCommand(
+                "emulator",
+                arguments: ["-avd", emulator.name, "-no-snapshot-load"],
+                background: true
+            )
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            await MainActor.run { self.loadEmulators() }
+        }
+    }
+    
     func stopEmulator(_ emulator: Emulator) {
         Task {
             var stopped = false

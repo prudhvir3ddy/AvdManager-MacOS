@@ -165,7 +165,8 @@ struct StatusBarContentView: View {
                                 isHovered: hoveredEmulator == emulator.name,
                                 isLast: index == emulatorManager.emulators.count - 1,
                                 onStart: { emulatorManager.startEmulator(emulator) },
-                                onStop: { emulatorManager.stopEmulator(emulator) }
+                                onStop: { emulatorManager.stopEmulator(emulator) },
+                                onColdStart: { emulatorManager.startEmulatorCold(emulator) } 
                             )
                             .onHover { isHovered in
                                 hoveredEmulator = isHovered ? emulator.name : nil
@@ -247,6 +248,7 @@ struct ToolboxStyleEmulatorRow: View {
     let isLast: Bool
     let onStart: () -> Void
     let onStop: () -> Void
+    let onColdStart: () -> Void
     
     @State private var showingMenu = false
     @Environment(\.colorScheme) var colorScheme
@@ -315,11 +317,12 @@ struct ToolboxStyleEmulatorRow: View {
                 
                 // Action Buttons - Toolbox style
                 HStack(spacing: 8) {
-                    ToolboxActionButton(
-                        title: emulator.isRunning ? "Stop" : "Start",
-                        isRunning: emulator.isRunning,
-                        action: emulator.isRunning ? onStop : onStart
-                    )
+                    if emulator.isRunning {
+                        ToolboxActionButton(title: "Stop", isRunning: emulator.isRunning, action: onStop)
+                    } else {
+                        ToolboxActionButton(title: "Start", isRunning: emulator.isRunning, action: onStart)
+                        ToolboxActionButton(title: "Cold Start", isRunning: emulator.isRunning, action: onColdStart)
+                    }
                 }
             }
             .padding(.horizontal, 24)
@@ -353,7 +356,7 @@ struct ToolboxActionButton: View {
             Text(title)
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(.white)
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 8)
                 .padding(.vertical, 8)
                 .background(
                     RoundedRectangle(cornerRadius: 6)
