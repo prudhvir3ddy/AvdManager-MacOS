@@ -317,7 +317,7 @@ struct ToolboxStyleEmulatorRow: View {
                 
                 // Action Buttons - Toolbox style
                 HStack(spacing: 8) {
-                    if (emulator.isRunning) {
+                    if emulator.isRunning {
                         ToolboxActionButton(title: "Stop", isRunning: emulator.isRunning, action: onStop)
                     } else {
                         ToolboxActionButton(title: "Start", isRunning: emulator.isRunning, action: onStart)
